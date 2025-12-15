@@ -4,6 +4,7 @@ import br.com.emanueldias.message.Message;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
 
@@ -13,19 +14,31 @@ public class Client {
         this.socket = new Socket(ip, port);
     }
 
-    public void sendMessage(String message) {
+    public void sendMessages() {
         try {
-            ObjectOutputStream output = new ObjectOutputStream(this.socket.getOutputStream());
-            ObjectInputStream input = new ObjectInputStream(this.socket.getInputStream());
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            Message send = new Message(
-                    this.socket.getInetAddress().toString(), null, message);
+            Scanner scanner = new Scanner(System.in);
 
-            output.writeObject(send);
-            output.flush();
+            while (true) {
+                System.out.print("Mensagem: ");
+                String text = scanner.nextLine();
 
-            String response = (String) input.readObject();
-            System.out.println("Mensagem do servidor: " + response);
+                if (text.equalsIgnoreCase("exit")) break;
+
+                Message msg = new Message(
+                        socket.getLocalAddress().toString(),
+                        null,
+                        text
+                );
+
+                output.writeObject(msg);
+                output.flush();
+
+                String response = (String) input.readObject();
+                System.out.println("Servidor: " + response);
+            }
 
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -33,6 +46,15 @@ public class Client {
             try {
                 socket.close();
             } catch (IOException ignored) {}
+        }
+    }
+
+
+    public void disconnectSocket() {
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

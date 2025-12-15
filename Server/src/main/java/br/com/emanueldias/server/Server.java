@@ -20,24 +20,30 @@ public class Server {
 
     public void resolveConnection(Socket socket) {
         try {
-            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+            ObjectOutputStream output =
+                    new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream input =
+                    new ObjectInputStream(socket.getInputStream());
 
-            Message message = (Message) input.readObject();
+            while (true) {
+                Message message = (Message) input.readObject();
 
-            System.out.println("Mensagem do cliente: " + message);
+                System.out.println("Mensagem do cliente: " + message);
 
-            output.writeObject("Mensagem recebida!");
-            output.flush();
+                output.writeObject("Mensagem recebida!");
+                output.flush();
+            }
 
+        } catch (EOFException ex) {
+            System.out.println("Cliente desconectou: " + socket.getInetAddress());
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         } finally {
             try {
                 socket.close();
-                System.out.println("Conexao fechada");
             } catch (IOException ignored) {}
         }
     }
+
 
 }

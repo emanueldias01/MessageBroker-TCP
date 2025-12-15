@@ -19,14 +19,13 @@ public class Main {
         int port = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Mensagem:");
-        String message = scanner.nextLine();
-
         try {
             client.createSocket(ip, port);
-            client.sendMessage(message);
+            client.sendMessages();
         } catch (IOException ex) {
             ex.printStackTrace();
+        } finally {
+            client.disconnectSocket();
         }
     }
 }

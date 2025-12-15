@@ -8,13 +8,12 @@ public class Message implements Serializable {
 
     private String ipFrom;
     private String ipTo;
+    private Object bodyMessage;
 
-    private Object body;
-
-    public Message(String ipFrom, String ipTo, Object body) {
+    public Message(String ipFrom, String ipTo, Object bodyMessage) {
         this.ipFrom = ipFrom;
         this.ipTo = ipTo;
-        this.body = body;
+        this.bodyMessage = bodyMessage;
     }
 
     public String getIpFrom() {
@@ -25,7 +24,12 @@ public class Message implements Serializable {
         return ipTo;
     }
 
-    public Object getBody() {
-        return body;
+    public Object getBodyMessage() {
+        return bodyMessage;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + ipFrom + ", " + ipTo + ", " + bodyMessage + "]";
     }
 }
