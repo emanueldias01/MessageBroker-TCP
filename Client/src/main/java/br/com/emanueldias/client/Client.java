@@ -1,9 +1,8 @@
 package br.com.emanueldias.client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import br.com.emanueldias.message.Message;
+
+import java.io.*;
 import java.net.Socket;
 
 public class Client {
@@ -16,23 +15,25 @@ public class Client {
 
     public void sendMessage(String message) {
         try {
-            DataInputStream input = new DataInputStream(this.socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(this.socket.getOutputStream());
+            ObjectOutputStream output = new ObjectOutputStream(this.socket.getOutputStream());
+            ObjectInputStream input = new ObjectInputStream(this.socket.getInputStream());
 
-            output.writeUTF(message);
+            Message send = new Message(
+                    this.socket.getInetAddress().toString(), null, message);
+
+            output.writeObject(send);
             output.flush();
 
-            String messageServer = input.readUTF();
+            String response = (String) input.readObject();
+            System.out.println("Mensagem do servidor: " + response);
 
-            System.out.printf("Mensagem do servidor: %s \n", messageServer);
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         } finally {
             try {
-                this.socket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+                socket.close();
+            } catch (IOException ignored) {}
         }
     }
+
 }

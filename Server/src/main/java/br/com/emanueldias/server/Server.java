@@ -1,9 +1,8 @@
 package br.com.emanueldias.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import br.com.emanueldias.message.Message;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -21,30 +20,24 @@ public class Server {
 
     public void resolveConnection(Socket socket) {
         try {
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            String clientMessage = input.readUTF();
+            Message message = (Message) input.readObject();
 
-            System.out.printf("Mensagem do cliente: %s \n", clientMessage);
+            System.out.println("Mensagem do cliente: " + message);
 
-            String messageServer = "Mensagem recebida!";
-            output.writeUTF(messageServer);
+            output.writeObject("Mensagem recebida!");
             output.flush();
 
-        }
-
-        catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 socket.close();
                 System.out.println("Conexao fechada");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
+            } catch (IOException ignored) {}
         }
     }
+
 }
