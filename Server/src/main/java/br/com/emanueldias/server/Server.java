@@ -32,8 +32,6 @@ public class Server {
             output.writeUTF(messageServer);
             output.flush();
 
-        }catch (EOFException ex) {
-            System.out.printf("Fim do stream de dados");
         }
 
         catch (IOException ex) {
