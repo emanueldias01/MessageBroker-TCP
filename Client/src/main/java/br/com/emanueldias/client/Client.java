@@ -1,6 +1,8 @@
 package br.com.emanueldias.client;
 
 import br.com.emanueldias.message.Message;
+import br.com.emanueldias.message.MessageQueueSelection;
+import br.com.emanueldias.message.Role;
 
 import java.io.*;
 import java.net.Socket;
@@ -14,31 +16,47 @@ public class Client {
         this.socket = new Socket(ip, port);
     }
 
-    public void sendMessages() {
+    public void sendMessages(MessageQueueSelection queueSelection) {
         try {
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            Scanner scanner = new Scanner(System.in);
+            output.writeObject(queueSelection);
+            output.flush();
 
-            while (true) {
-                System.out.print("Mensagem: ");
-                String text = scanner.nextLine();
+            String responseQueueAccept = (String) input.readObject();
 
-                if (text.equalsIgnoreCase("exit")) break;
+            if(responseQueueAccept.equals("Acesso concedido a fila!")) {
+                if(queueSelection.getRole().equals(Role.PRODUCER)) {
+                    Scanner scanner = new Scanner(System.in);
 
-                Message msg = new Message(
-                        socket.getLocalAddress().toString(),
-                        null,
-                        text
-                );
+                    while (true) {
+                        System.out.print("Mensagem: ");
+                        String text = scanner.nextLine();
 
-                output.writeObject(msg);
-                output.flush();
+                        if (text.equalsIgnoreCase("exit")) break;
 
-                String response = (String) input.readObject();
-                System.out.println("Servidor: " + response);
+                        Message msg = new Message(
+                                socket.getLocalAddress().toString(),
+                                null,
+                                text
+                        );
+
+                        output.writeObject(msg);
+                        output.flush();
+
+                        String response = (String) input.readObject();
+                        System.out.println("Servidor: " + response);
+                    }
+                } else {
+                    while (true) {
+                        Message message = (Message) input.readObject();
+                        System.out.println("Nova mensagem recebida: " + message);
+                    }
+                }
             }
+
+
 
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();

@@ -1,17 +1,25 @@
 package br.com.emanueldias.server;
 
 import br.com.emanueldias.message.Message;
+import br.com.emanueldias.message.MessageQueueSelection;
+import br.com.emanueldias.queue.QueueMessages;
+import br.com.emanueldias.message.Role;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class Server {
 
     private ServerSocket serverSocket;
+    List<QueueMessages> queueMessagesList;
 
     public void createServerSocket(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
+        this.queueMessagesList = new ArrayList<>();
     }
 
     public Socket getSocketConnectionClient() throws IOException {
@@ -20,29 +28,56 @@ public class Server {
 
     public void resolveConnection(Socket socket) {
         try {
-            ObjectOutputStream output =
-                    new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream input =
-                    new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            while (true) {
-                Message message = (Message) input.readObject();
+            MessageQueueSelection queueSelection = (MessageQueueSelection) input.readObject();
 
-                System.out.println("Mensagem do cliente: " + message);
+            QueueMessages queueMessages = searchQueue(queueSelection.getQueueId());
 
-                output.writeObject("Mensagem recebida!");
-                output.flush();
+            output.writeObject("Acesso concedido a fila!");
+            output.flush();
+
+            if(queueSelection.getRole().equals(Role.PRODUCER)){
+                while (true) {
+                    Message message = (Message) input.readObject();
+
+                    System.out.println("Mensagem do cliente: " + message);
+
+                    output.writeObject("Mensagem recebida!");
+                    output.flush();
+                    queueMessages.addMessage(message);
+                }
+            }else {
+                while (true) {
+                    Message message = queueMessages.takeMessage();
+                    output.writeObject(message);
+                    output.flush();
+                }
             }
 
         } catch (EOFException ex) {
             System.out.println("Cliente desconectou: " + socket.getInetAddress());
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
         } finally {
             try {
                 socket.close();
             } catch (IOException ignored) {}
         }
+    }
+
+    private QueueMessages searchQueue (String id) {
+        Optional<QueueMessages> optionalQueueMessages = queueMessagesList.stream().filter(q -> q.getId().equals(id)).findFirst();
+        if(optionalQueueMessages.isEmpty()) {
+            QueueMessages queueMessages = new QueueMessages(id);
+            this.queueMessagesList.add(queueMessages);
+            return queueMessages;
+        }
+
+        return optionalQueueMessages.get();
     }
 
 

@@ -16,7 +16,9 @@ public class Main {
 
             while (true) {
                 Socket socket = server.getSocketConnectionClient();
-                server.resolveConnection(socket);
+                new Thread(() -> {
+                    server.resolveConnection(socket);
+                }).start();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
