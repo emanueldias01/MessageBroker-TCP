@@ -1,9 +1,7 @@
 package br.com.emanueldias.server;
 
-import br.com.emanueldias.message.Message;
-import br.com.emanueldias.message.MessageQueueSelection;
+import br.com.emanueldias.message.*;
 import br.com.emanueldias.queue.QueueMessages;
-import br.com.emanueldias.message.Role;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -44,7 +42,8 @@ public class Server {
 
                     System.out.println("Mensagem do cliente: " + message);
 
-                    output.writeObject("Mensagem recebida!");
+                    ServerMessage serverMessage = new ServerMessage("Mensagem recebida: %s".formatted(message.getBodyMessage()), StatusMessage.RECEIVED);
+                    output.writeObject(serverMessage);
                     output.flush();
                     queueMessages.addMessage(message);
                 }
