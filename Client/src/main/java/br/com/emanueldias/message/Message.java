@@ -6,22 +6,24 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String ipFrom;
-    private String ipTo;
+    private String serviceName;
     private Object bodyMessage;
 
-    public Message(String ipFrom, String ipTo, Object bodyMessage) {
-        this.ipFrom = ipFrom;
-        this.ipTo = ipTo;
+    public Message(String serviceName, Object bodyMessage) {
+        this.serviceName = serviceName;
         this.bodyMessage = bodyMessage;
     }
 
-    public String getIpFrom() {
-        return ipFrom;
+    public void setBodyMessage(Object bodyMessage) {
+        this.bodyMessage = bodyMessage;
     }
 
-    public String getIpTo() {
-        return ipTo;
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public Object getBodyMessage() {
@@ -30,6 +32,6 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + ipFrom + ", " + ipTo + ", " + bodyMessage + "]";
+        return "[" + serviceName + ", " + bodyMessage + "]";
     }
 }
