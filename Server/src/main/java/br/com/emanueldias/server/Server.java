@@ -48,10 +48,17 @@ public class Server {
                     queueMessages.addMessage(message);
                 }
             }else {
+                queueMessages.addOutputStreamConsumer(output);
                 while (true) {
                     Message message = queueMessages.takeMessage();
-                    output.writeObject(message);
-                    output.flush();
+                    queueMessages.getOutputStreamsConsumers().forEach(o -> {
+                        try {
+                            o.writeObject(message);
+                            output.flush();
+                        } catch (IOException e) {
+                            System.out.println("Cliente desconectou: " + socket.getInetAddress());
+                        }
+                    });
                 }
             }
 
