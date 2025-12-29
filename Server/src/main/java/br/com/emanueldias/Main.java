@@ -9,6 +9,8 @@ import java.net.Socket;
 public class Main {
     public static void main(String[] args) {
 
+        System.setProperty("javax.net.ssl.keyStore", "./keystore.p12");
+        System.setProperty("javax.net.ssl.keyStorePassword", "123456");
         Server server = new Server();
 
         try {

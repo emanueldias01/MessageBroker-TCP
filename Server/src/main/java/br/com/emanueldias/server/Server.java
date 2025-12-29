@@ -3,8 +3,9 @@ package br.com.emanueldias.server;
 import br.com.emanueldias.message.*;
 import br.com.emanueldias.queue.QueueMessages;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +13,12 @@ import java.util.Optional;
 
 public class Server {
 
-    private ServerSocket serverSocket;
+    private SSLServerSocket serverSocket;
     List<QueueMessages> queueMessagesList;
 
     public void createServerSocket(int port) throws IOException {
-        this.serverSocket = new ServerSocket(port);
+        SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+        this.serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
         this.queueMessagesList = new ArrayList<>();
     }
 

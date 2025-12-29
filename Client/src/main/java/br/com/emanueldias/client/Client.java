@@ -2,19 +2,21 @@ package br.com.emanueldias.client;
 
 import br.com.emanueldias.message.*;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Client {
 
-    private Socket socket;
+    private SSLSocket socket;
     private Role role;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
     public void createSocket(String ip, int port) throws IOException {
-        this.socket = new Socket(ip, port);
+        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        this.socket = (SSLSocket) ssf.createSocket(ip, port);
     }
 
     public void sendConnectionMessage(MessageQueueSelection queueSelection) {
