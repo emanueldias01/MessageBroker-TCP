@@ -7,14 +7,14 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String serviceName;
-    private Object bodyMessage;
+    private String bodyMessage;
 
-    public Message(String serviceName, Object bodyMessage) {
+    public Message(String serviceName, String bodyMessage) {
         this.serviceName = serviceName;
         this.bodyMessage = bodyMessage;
     }
 
-    public void setBodyMessage(Object bodyMessage) {
+    public void setBodyMessage(String bodyMessage) {
         this.bodyMessage = bodyMessage;
     }
 
@@ -26,7 +26,7 @@ public class Message implements Serializable {
         this.serviceName = serviceName;
     }
 
-    public Object getBodyMessage() {
+    public String getBodyMessage() {
         return bodyMessage;
     }
 
