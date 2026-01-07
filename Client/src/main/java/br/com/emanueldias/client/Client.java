@@ -61,6 +61,9 @@ public class Client {
     }
 
     public Message listenMessage() {
+        if(this.role == null) {
+            throw new IllegalAccessError("Não é possível enviar mensagem pois ROLE não está definida");
+        }
         if(this.role.equals(Role.CONSUMER)) {
             try {
                 return (Message) this.inputStream.readObject();
