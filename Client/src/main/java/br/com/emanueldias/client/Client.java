@@ -42,6 +42,9 @@ public class Client {
     }
 
     public void sendMessage(Message message) throws IOException, ClassNotFoundException {
+        if(this.role == null) {
+            throw new IllegalAccessError("Não é possível enviar mensagem pois ROLE não está definida");
+        }
         if(this.role.equals(Role.PRODUCER)){
             this.outputStream.writeObject(message);
             this.outputStream.flush();
